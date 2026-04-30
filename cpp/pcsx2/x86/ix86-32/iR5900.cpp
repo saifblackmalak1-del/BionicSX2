@@ -1862,9 +1862,11 @@ void R5900::Dynarec::OpcodeImpl::recSYSCALL()
 	{
 		if (g_cpuConstRegs[3].UC[0] == 0x64 || g_cpuConstRegs[3].UC[0] == 0x68)
 		{
-			// Emulate the amount of cycles it takes for the exception handlers to run
-			// This number was found by using github.com/F0bes/flushcache-cycles
 			s_nBlockCycles += 5650;
+      s_nBlockCycles += 5650;
+			// Force full JIT cache reset (direct fix for the black-screen issue)
+			iFlushCall(FLUSH_EVERYTHING);
+			armEmitCall(reinterpret_cast<void*>(recResetRaw));
 			return;
 		}
 	}
