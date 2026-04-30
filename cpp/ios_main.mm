@@ -1476,6 +1476,22 @@ int main(int argc, char * argv[]) {
     // InstallSignalHandler(); // Removed
     
     @autoreleasepool {
+        // [DIAGNOSTIC] Redirect console output to Documents folder for log analysis
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsPath = [paths firstObject];
+        
+        // Create Documents directory if it doesn't exist
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        [fileManager createDirectoryAtPath:documentsPath withIntermediateDirectories:YES attributes:nil error:nil];
+        
+        // Redirect stderr and stdout to log file
+        NSString *logFilePath = [documentsPath stringByAppendingPathComponent:@"JIT_Diag_Log.txt"];
+        freopen([logFilePath fileSystemRepresentation], "a", stderr);
+        freopen([logFilePath fileSystemRepresentation], "a", stdout);
+        
+        fprintf(stderr, "\n=== iPSX2 JIT Diagnostics Log Started ===\n");
+        fflush(stderr);
+        
         // SDL_MAIN_HANDLED is set, so we use standard main()
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([PCSX2AppDelegate class]));
     }
